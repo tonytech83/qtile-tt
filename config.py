@@ -75,15 +75,15 @@ keys = [
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     Key([mod], "e", lazy.spawn(explorer), desc="Run explorer"),
     Key([mod, "shift"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod], "Return", lazy.function(swap_master_with_focused)),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key([mod], "n", lazy.layout.reset(), desc="Reset all window sizes"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([mod], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key([mod], "h", lazy.layout.shrink(), desc="Grow window to the left"),
+    Key([mod], "l", lazy.layout.grow(), desc="Grow window to the right"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-        Key([mod], "equal",
+    Key([mod], "Return", lazy.function(swap_master_with_focused)),
+    Key([mod], "equal",
         lazy.layout.grow_left().when(layout=["bsp", "columns"]),
         lazy.layout.grow().when(layout=["monadtall", "monadwide"]),
         desc="Grow window to the left"
@@ -186,6 +186,7 @@ widget_defaults = dict(
     font=the_font,
     fontsize=16,
     padding=0,
+    fontweight="bold",
     background=colors[0]
 )
 
@@ -236,74 +237,134 @@ screens = [
                     foreground = colors[6],
                     max_chars = 100
                 ),
-                widget.Spacer(length = 8),
-                widget.CPU(
-                    format = ' {load_percent}%',
-                    foreground = colors[4],
+                widget.AGroupBox(
+                    center_aligned = False,
+                    
+                    border = colors[3],
+                    foreground = colors[0],
+                    background = colors[3],
                     decorations=[
                         BorderDecoration(
-                            colour = colors[4],
-                             border_width = [0, 0, 0, 0],
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
+                        )
+                    ],
+                ),
+                widget.Spacer(length = 8),
+                widget.CryptoTicker(
+                    api = 'coinbase',
+                    foreground = colors[0],
+                    background = colors[5],
+                    update_interval = 600,
+                    crypto = 'BTC',
+                    format = '  {amount:.2f} ',
+                    decorations=[
+                        BorderDecoration(
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
+                        )
+                    ],
+                ),
+                widget.Spacer(length = 8),
+                widget.CPU(
+                    format = '  {load_percent}% ',
+                    background = colors[4],
+                    foreground = colors[0],
+                    decorations=[
+                        BorderDecoration(
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
                 widget.Spacer(length = 8),
                 widget.ThermalSensor(
                     tag_sensor='Package id 0',
-                    format = ' {temp:.0f}{unit}',
-                    foreground = colors[5],
+                    format = '  {temp:.0f}{unit} ',
+                    foreground = colors[0],
+                    background = colors[5],
                     threshold=70.0,
+                    mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e btop')},
                     decorations=[
                         BorderDecoration(
-                            colour = colors[4],
-                             border_width = [0, 0, 0, 0],
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
                 widget.Spacer(length = 8),
                 widget.Memory(
-                    foreground = colors[8],
+                    foreground = colors[0],
+                    background = colors[8],
                     measure_mem='G',
-                    mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(terminal + ' -e btop')},
-                    format = '{MemUsed:.0f}{mm}/{MemTotal:.0f}{mm}',
-                    fmt = '  {}',
+                    format = '{MemUsed:.0f}{mm}/{MemTotal:.0f}{mm} ',
+                    fmt = '  {}',
                     decorations=[
                         BorderDecoration(
-                            colour = colors[8],
-                             border_width = [0, 0, 0, 0],
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
                 widget.Spacer(length = 8),
                 widget.Volume(
-                    foreground = colors[7],
-                    fmt = ' {}',
+                    foreground = colors[0],
+                    background = colors[7],
+                    fmt = '  {} ',
                     decorations=[
                         BorderDecoration(
-                            colour = colors[7],
-                             border_width = [0, 0, 0, 0],
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
                 widget.Spacer(length = 8),
                 widget.KeyboardLayout(
-                    foreground = colors[4],
-                    fmt = '  {}',
+                    foreground = colors[0],
+                    background = colors[4],
+                    fmt = '  {} ',
                     decorations=[
-                        BorderDecoration(
-                            colour = colors[4],
-                             border_width = [0, 0, 0, 0],
+                            BorderDecoration(
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
                 widget.Spacer(length = 8),
-                widget.Clock(
-                    foreground = colors[8],
-                    format = " %a, %b %d  %H:%M",
+                widget.Wlan(
+                    interface='wlan0',
+                    format='  {essid} ',
+                    disconnected_message='',
+                    foreground = colors[0],
+                    background = colors[3],
                     decorations=[
                         BorderDecoration(
-                            colour = colors[8],
-                             border_width = [0, 0, 0, 0],
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
+                        )
+                    ],
+                ),
+                # widget.Spacer(length = 8),
+                # widget.Battery(
+                #     format='  {percent:.0f}% ',
+                #     foreground = colors[0],
+                #     background = colors[7],
+                #     decorations=[
+                #         BorderDecoration(
+                #             colour=colors[0],
+                #             border_width=[3, 3, 3, 3],
+                #         )
+                #     ],
+                # ),
+                widget.Spacer(length = 8),
+                widget.Clock(
+                    foreground = colors[0],
+                    background = colors[8],
+                    format = "  %d-%m-%y  %H:%M ",
+                    decorations=[
+                        BorderDecoration(
+                            colour = colors[0],
+                            border_width = [3, 3, 3, 3],
                         )
                     ],
                 ),
